@@ -30,3 +30,20 @@ GET /elapsed/10
 # Increase the memory consumption to 10 MB (more or less)  then return 201
 POST /size/10
 ```
+
+## Container Image
+
+```
+podman|docker run -d -p 8000:8000 quay.io/pvlerick/smashblow:latest
+```
+
+Check that it is running, using [httpie](https://httpie.io/) :
+
+```
+http GET http://localhost:8000
+```
+
+or curl
+```
+curl http://localhost:8000
+```
