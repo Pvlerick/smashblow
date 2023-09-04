@@ -1,0 +1,34 @@
+name: Build and Push Image
+on: [ push ]
+
+jobs:
+  build:
+    name: Build and Push Image
+    runs-on: ubuntu-20.04
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Build Image
+      id: build-image
+      uses: redhat-actions/buildah-build@v2
+      with:
+        image: smashblow
+        tags: latest ${{ github.ref_name }}
+        containerfiles: |
+          ./Containerfile
+
+    - name: Push to quay.io
+      id: push-to-quay
+      if: github.ref_type == 'tag'
+      uses: redhat-actions/push-to-registry@v2
+      with:
+        image: ${{ steps.build-image.outputs.image }}
+        tags: ${{ steps.build-image.outputs.tags }}
+        registry: quay.io/pvlerick
+        username: pvlerick
+        password: ${{ secrets.QUAY_PASSWORD }}
+
+    - name: Print image url
+      if: github.ref_type == 'tag'
+      run: echo "Image pushed to ${{ steps.push-to-quay.outputs.registry-paths }}"
