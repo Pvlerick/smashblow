@@ -14,12 +14,13 @@ jobs:
       uses: redhat-actions/buildah-build@v2
       with:
         image: smashblow
-        tags: latest ${{ github.sha }}
+        tags: latest ${{ vars.GITHUB_REF }}
         containerfiles: |
           ./Containerfile
 
     - name: Push to quay.io
       id: push-to-quay
+      if: github.ref_type == 'tag'
       uses: redhat-actions/push-to-registry@v2
       with:
         image: ${{ steps.build-image.outputs.image }}
@@ -29,4 +30,5 @@ jobs:
         password: ${{ secrets.QUAY_PASSWORD }}
 
     - name: Print image url
+      if: github.ref_type == 'tag'
       run: echo "Image pushed to ${{ steps.push-to-quay.outputs.registry-paths }}"
